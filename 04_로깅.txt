@@ -1,0 +1,31 @@
+로킹
+
+(스프링 부트는 기본적으로 Commons Logging을 사용한다.) 결국에는 SLF4J를 사용한다.
+
+로깅 퍼사드 vs 로거
+  - Commons Logging, SLF4j      - -> 실제 로깅을 하는 애들이 아니고 로거 API들을 추상화해논 인터페이스 들이다.
+ - JUL, Log4js, Logback
+ 
+
+
+로깅 퍼사드의 장점. 
+- 로깅 퍼사드 하위의 JUL, Log4js, Logback 을 바꿔서 낄 수 있다.
+
+
+
+
+스피링 5에 로거 관련 변경 사항
+- Spring-JCL
+      -- Commons Logging -> SJL4j or Log4j2
+      -- pom.xml 에 exclusion 안해도 됨. 
+
+
+스프링 부트 로깅
+- 기본 포맷
+- --debug(일부 핵심 라이브러리만 디버깅 모드로)
+- --trace ( 전부 다 디버깅 모드로)
+- 컬러 출력 : spring.output.ansi.enabled
+- 파일 출력 : loggin.file 또는 logging.path
+- 로그 레벨 조정 : logging.level.패키지 = 로그 레벨. 
+
+

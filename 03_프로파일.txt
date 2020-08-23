@@ -1,0 +1,82 @@
+프로파일
+
+@Profile 애노테이션은 어디에?
+ 	- @Configuration
+	- @Component
+어떤 프로파일을 활성화 할 것인가?
+	- spring.profiles.include
+
+프로파일용 프로퍼티
+	-application-{profile}.properties
+
+---------------------------------------
+config directory 생성.
+- BaseConfiguration class 생성
+- TestConfiguration class 생성. 
+
+@Profile("test")
+@Configuration
+public class TestConfiguration{
+
+    @Bean
+    public String hello(){
+        return "hello test";
+    }
+}
+
+@Profile("prod")
+@Configuration
+public class BaseConfiguration{
+    @Bean
+    public String hello(){
+        return "hello";
+    }
+}
+
+
+@Component
+public class SampleRunner implements ApplicationRunner{
+    @Autowired
+    private String hello;
+
+    @Autowired
+    private KeesunProperties keesunProperties;
+   
+    public void run(ApplicationArguments args) throws Exception{
+        System.out.println("=============");
+        System.out.println(hello);
+        System.out.println(keesunProperties.getName());
+        System.out.println("=============");
+    }
+}
+
+
+@SpringBootApplication
+public class SpringinitApplication{  
+    public static void main(String[] args){
+        SpringApplication app = new SpringApplication(SpringinitApplication.class);
+        app.setWebApplicationType(WebApplicationType.NONE);
+        app.run(args);
+    }
+}
+
+
+keesun.name = Keesun
+keesun.age = 100
+keesun.full-name= = ${keesun.name} Baik
+keesun.session-timeout=25s
+//spring.profiles.active=test
+spring.profies.active=prod
+                                                        application.properties;
+
+
+keesun.name= keesun test
+			application-test.properties
+
+keesun.name=keesun prod
+spring.profies.include=proddb            //이 설정이 읽혀 졌으면 prodb를 활성화 한다.
+			application-prod.properties
+
+keesun.full-name=dbddb
+
+			application-prodb.properties

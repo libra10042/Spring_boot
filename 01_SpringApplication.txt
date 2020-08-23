@@ -1,0 +1,103 @@
+■ Spring Application 이란?
+- 기본 로그 레벨 INFO
+    
+@SpringBootApplication
+public class SpringApplication{
+
+	public static viod main(String[] args){
+		SprinApplication app = new SpringAppliation(SpringinitApplication.class);
+		app.run(args);
+	}
+}
+
+
+@SpringbootApplication
+public class StringinitApplication{
+
+	public static void main(String[] args){
+
+		SpringApplication app = new SpringApplication(SpringinitApplication.class);
+		app.setBanner((enviroment, sourceClass, out) ->{
+			out.println("==========");
+			out.println("WHITESHIP");
+			out.println("==========");
+		});
+		app.setBannerMode(Banner.Mode.OFF);	
+		app.run(args);
+
+	}
+}
+
+
+
+@SpringApplication
+public class SpringinitApplication{
+
+	public static void main(String[] args){
+		new SpringApplicationBuilder()
+			.sources(SpringApplication.class)
+			.run(args);
+	}
+}
+
+
+
+■ Application Events and Listeners
+: application Events Listener을 만드는 방법은 쉽다 하지만 주의 해야할 점이 있다.**
+
+<!--
+public class SampleListner implements ApplicationListener<ApplicationStartingEvent>{
+
+	public void onApplicationEvent(ApplicationStartingEvent applicationStartListener){
+		System.out.println("============");
+		System.out.println("Application is starting");
+		System.out.println("============");
+	}
+}
+-->
+@SpringBootApplication
+public class SpringinitApplication{
+	public static void main(String[] args){
+		SpringApplication app = new SpringApplication(SpringinitApplication.class);
+		app.addListeners(new SampleListener());
+		app.run(args);
+	}
+}
+
+ApplicationEvent 등록
+- ApplicationContext를 만들기 전에 사용하는 리스터는 @Bean으로 등록할 수 없다. 
+	-SpringApplication.addListners()
+- WebApplicationType 설정
+- 애플리케이션 아규먼트 사용하기
+ 	- ApplicationArguments를 빈으로 등록해 주니깐 가져다 쓰면 됨.
+- 애플리케이션 실행한 뒤 뭔가 실행하고 싶을 때 
+	- ApplicationRunner(추천) 또는 CommandLineRunner
+	- 순서 지정 가능 @Order
+
+
+
+@SpringBootApplication
+public class SpringinitApplication{
+
+	public static void main(String[] args){
+		SpringApplication app = new SpringApplication(SpringinitApplication.class);
+		app.setWebApplicationType(WebApplicationType.REACTIVE);
+		app.run(args)
+
+	}
+}
+
+
+@Component
+public class SampleListner{
+
+	public SampleListener(ApplicationArgurments arguments){
+		System.out.println("foo : " + arguments.containsOption(name :"foo");
+		System.out.println("bar :" + arguments.containsOption(name:"bar");
+	}
+}
+
+
+--------------------------------------------------------------------
+
+
