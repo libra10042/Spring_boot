@@ -1,0 +1,256 @@
+<학습 내용>
+시작은 일단 spring-boot-starter-test를 추가하는 것부터
+       - test 스콥으로 추가. 
+
+
+@SpringBootTest
+     - @RunWith(SpringRuner.class)랑 같이 써야 함. 
+     - 빈 설정 파일은 설정을 안해줘도 되나? 알아서 찾는다.(@SpringBootApplication)
+     - webEnviroment
+                -- MOCK : mock servlet enviroment. 내장 톰캣 구동 안 함.
+                -- RANDOM_PORT, DEFINED_PORT :  내장 톰캣 사용 함.  (RANDOM_PORT를 추천함./ DEFINED_PORT는 우리가 포트를 정해서 사용할 수 있음. )
+                -- NONE : 서블릿 환경 제공 안함. 
+
+@MockBean
+     - ApplicationContext에 들어있는 빈을 Mock으로 만든 객체로 교체함. 
+     - 모든 @Test 마다 자동으로 리셋
+
+
+
+슬라이스 테스트
+      - 레이어 별로 잘라서 테스트하고 싶을 떄 
+      -  @JsonTest
+      -  @WebMvcTest
+      -  @WebFluxTest
+      -  @DataJpaTest 
+
+
+────────────────────────────────────────────
+
+@RestController
+public class SampleController{
+
+	@Autowired
+	private SampleService sampleService;
+
+	@GetMapping("/hello")
+	public String hello(){
+		return "hello" + sampleService.getName();
+	}
+}
+				sampleController
+	
+
+@Service
+public class SampleService{
+	public String getName(){
+		return null;  
+	}
+}
+				SampleService
+─────────────────────────────────────────────
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnviroment = SpringBootTest.WebEnviroment.MOCK)
+@AutoConfigureMockMvc
+public class SampleControllerTest{
+
+	@Autowired
+	MockMvc mockMvc;
+	
+	@Test
+	public void hello() throw Exception{
+	        mockMvc.perform(get("/hello"))
+	                .andExpect(status().isOk())
+	                .andExpect(content().string("hello kesun"))
+ 	                .andDo(print());			
+	}
+} 
+
+↑테스트 환경이 mock으로 잡혀있을 때 사용하는 방법.
+-----------------------------------
+@Runwith(SpringRunner.class)
+@SpringBootTest(webEnviroment = SpringBootTest.WebEnviroment.RANDOM_PORT)
+public class SampleControllerTest{
+
+	@Autowired
+	TestRestTemplate restRestTemplate;	
+	
+	@MockBean
+	SampleService mocksSampleService;
+
+	@Test
+	public void hello() throws Exception{
+		when(mockSampleService.getName().thenReturn("whiteship");
+
+		String result = testRestTemplate.getForObject("/hello", String.class);
+		assertThat(result).isEqualsTo("hello whiteship");
+	}
+}
+
+↑ 테스트용 web client를 써야 한다.  (@MockBean을 사용해서 부분만 교체한 것이다.) 
+-------------------------------------
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnviroment = SpringBootTest.WebEnviroment.RANDOM_PORT)
+public class SampleControllerTest{
+	@Autowired
+	WebTestClient webTestClient;
+
+	@MockBean
+	SampleService mockSampleService;
+
+	@Test
+	public void hello() throws Exception{
+		when(mockSampleService.getName()).thenResult("whiteship");
+		
+		webTestClient.get().uri("/hello").exchange()
+			.expectStatus().isOk()
+			.expectBody(String.class).isEqualsTo("hello whiteship");
+	}
+}
+
+WebTestClient는 java5에 새롭게 추가된 기능이다.
+webclient는 Asynchronous(비동기)이다. ( 기다리는 것이 아니라, 응답이 오면 그 때 우리한테 collback이 온다.) 
+
+RestTemplate이 가장 불편하다. mocMvc은 2번째로 불편하다. - 강사님-
+
+WebTestClient를 쓰자..! (dependency추가..!)
+<dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webflux</artifactId>
+</dependency>
+
+
+
+
+────────────────────────
+servlet 기반 spring webmvc는 쓰지만, 실제로 내 앱이 rest Call을 할 것이 많다고 하면
+asynchronous로 call하는 것이 성능상으로도 이득이다. 
+
+@SpringBootTest가 하는 일?
+Step1. @SpringBoot 통합 테스트는 SpringBootApplication을 찾아간다.
+Step2 . @SpringBootApplication을 찾아서 모든 빈 스캔 후 
+Step3. (@SpringBootTest ) 모든 것을  테스트용 application Context로 만든 후 모든 것을 bean으로 만들어준다.
+(@SpringBootTest(webEnviroment = SpringBootTest.WebEnviroment.RANDOM_PORT))
+
+Step4. @MockBean을 찾아서 mockBean만 교체해준다.
+
+
+─────────────────────────────────────────────────
+모든 것을 테스트 하지 않고 부분만 테스트 하고 싶다고 하면 슬라이스 테스트를 사용하면 된다.
+(레이어 별로 잘라서 적용)
+      -  @JsonTest
+      -  @WebMvcTest
+      -  @WebFluxTest
+      -  @DataJpaTest 
+
+
+@RunWith(SpringRunner.class)
+@JsonTest
+public class SampleControllerTest{
+
+	@Autowired
+	JacksonTester<Sample>
+
+	@Test
+	public void hello() throws Exception{
+	        when(mockSampleService.getName().thenReturn("whiteship");
+
+	        webTestClient.get().uri("/hello").exchange()
+		.expectStatus().isOk()
+		.expectBody(String.class).isEqualsTo("hello whiteship");
+	}
+}
+
+
+@RunWith(SpringRunner.class)
+@WebMvcTest(SampleController.class) //bean하나만 테스트 한다.
+public class SampleControllerTest{
+	
+	@MockBean
+	SampleService sampleService;
+	
+	@Autowired
+	MockMvc mockMvc;
+
+	@Test
+	public void hello() throws Exception{
+	        when(mockSampleService.getName().thenReturn("whiteship");
+
+	        mockMvc.perform(get("/hello"))
+		.andExpect(content().string("hello whiteship"));
+	}
+}
+
+@WebMvcText는 사용하는 의존성이 있다면 MockBean을 이용해서 의존성을 등록해주어야 한다.
+(빈 하나만 등록되어 가벼운 테스트가 된다.)
+
+
+─────────────────────────────────────────────────
+테스트 유틸.
+- OuputCapture
+    └ 로그 포함 콘솔에 찍히는 모든 것들을 테스트한다.
+
+@RunWith(SpringRunner.class)
+@WebMvcTest(SampleController.class)
+public class SampleControllerTest{
+	@Rule
+	public OutputCaptrue outputCapture = new OutputCapture();
+
+	@MockBean
+	SampleService mockSampleService;
+
+	@Autowired
+	MockMvc mockMvc;
+
+	@Test
+	public void hello() throws Exception {
+		when(mockSampleService.getName().thenReturn("whiteship");
+
+		mockMvc.perform(get("/hello"))
+			.andExpect(content().string("hello whiteship"));
+
+		assertThat(outputCapture.toString()).contains("holoman").contains("skip");
+	}
+}			
+				SampleControllerTest
+
+		
+
+@RestController
+public class SampleController{
+
+	Logger logger = LoggerFactory.getLogger(SampleController.class);
+
+	@Autowired
+	private SampleService sampleService;
+
+	@GetMapping("/hello")
+	public String hello(){
+		logger.info("holoman");
+		System.out.println("skip");
+		return "hello " + sampleService.getName();	
+	}
+}
+				SampleController
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
