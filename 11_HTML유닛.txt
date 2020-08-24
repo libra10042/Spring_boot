@@ -1,0 +1,49 @@
+■스프링 웹 MVC 8부 : HtmlUnit
+
+HTML 템플릿 뷰 테스트를 보다 전문적으로 하자.
+- http://htmlunit.sourceforge.net/
+- http://htmlunit.sourceforge.net/gettingStated.html
+-의존성 추가. 
+
+
+<dependency>
+	<groupId>org.seleniumhq.selenium</groupId>
+	<artifactId>htmlunit-driver</artifactId>
+	<scope>test</scope>
+</dependency>  
+<dependency>
+	<groupId>net.sourceforge.htmlunit</groupId>
+	<artifactId>htmlunit</artifactId>
+	<scope>test</scope>
+</dependency>
+
+@Autowire WebClient
+───────────────────────────────────────
+
+@RunWith(SpringRunner.class)
+@WebMvcTest(SampleController.class)
+public class SampleControllerTest{
+	
+	@Autowired
+	WebClient webClient;
+
+	@Autowired
+	MockMvc mockMvc;
+
+	@Test
+	public void hello() throws Exception{
+		HtmlPage page = webClient.getPage("/hello");
+		HtmlHeading1 h1 = page.getFirstByXPath("//h1");
+		assertThat(h1.getTextContent()).isEqualToIgnoreCase("keesun");
+	}
+}
+
+
+
+
+
+
+
+
+
+

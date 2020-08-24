@@ -1,0 +1,40 @@
+필수가 아니라 선택이다.
+
+Spring-boot-Devtools ( Springboot가 제공하는 optional한 툴이다.)
+
+
+<dependency>
+        <groupId>org.springframework.book</groupId>
+        <artifactId>spring-boot-devtools-</artifactId>
+</dependency>
+
+
+개발할 때 cache가 적용되어 있으면 바뀐 것들이 바로바로 확인이 안된다.
+(브라우저에서 직접 캐시를 비워야 하는 불편함이 있다.)
+- 캐시 설정을 개발 환경에 맞게 변경
+- 클래스패스에 있는 파일이 변경될 때마다 자동으로 재시작
+           -- 직접 껐다 켜는거 (cold starts)보다 빠름. why?
+           -- 릴로딩 보다는 느리다.(JRebel 같은 건 아님)
+           -- 리스타트 하고 싶지 않은 리소스는? spring.devtools.restart.exclude
+           -- 리스타트 기능 끄려면? spring.devtools.restart.enabled = false
+
+- 라이브 릴로드? 리스타트 했을 때 브라우저 자동 리프레시 하는 기능.
+           -- 브라우저 플러그인 설치해야함.
+           -- 라이브 릴로드 서버 끄려면/ spring.devtools.liveload.enabled = false
+
+- 글로벌 설정
+            -- ~/.spring-boot-devtools.properties 
+
+
+
+코드가 변경될 떄 restart속도가 빠르다. 
+
+Frontend의 restart 와 유사하다.
+
+Spring-Boot-Devtools는 1순위 우선순위이다.
+
+
+
+
+
+ 
