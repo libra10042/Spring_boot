@@ -1,4 +1,4 @@
-■ Spring Application 이란?
+ ■ Spring Application 이란?
 - 기본 로그 레벨 INFO
     
 @SpringBootApplication

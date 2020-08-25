@@ -1,0 +1,114 @@
+스프링 데이터 Spring-Data-JPA 연동
+ 
+ORM(Object-Relational Mapping)과 JPA ( Java Persistence API)
+	- 객체와 릴레이션을 맵핑할 때 발생하는 개념적 불일치를 해결하는 프레임워크
+	- http://hibernate.org/orm/what-is-an-orm/
+
+
+스프링 데이터 JPA
+	- Repository
+	- 쿼리 메소드 자동 구현
+	- @EnableJpaRepositories (스프링 부트가 자동으로 설정 해줌)
+	- SDJ -> JPA-> Hibernate->Datasource
+스프링 데이터 JPA 의존성 추가. 
+──────────────────────────────────
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+
+
+스프링 데이터 JPA 사용하기
+	- @Enitity 클래스 만들기
+	- Repository 만들기
+
+스프링 데이터 리파지토리 테스트 만들기
+	- h2 db를 테스트 의존성에 추가하기
+	- @DataJpaTest (슬라이스 테스트) 작성. 
+
+-----------------------
+vo, interface 만들기!
+@Entity
+public class Acconut{
+
+	@Id @GeneratedValue
+	private Long id;
+	
+	private String username;
+	
+	private String password;
+
+	//getter, setter, hasCode
+}
+
+
+
+public interface AccountRepository extends JpaRepository<Account, Long>{
+	Optional<Account> findByUsername(String username);
+	//Account findByUsername(String username);
+}
+
+
+test 만들기!
+@RunWith(SpringRunner.class)
+@DataJpaTest
+public class AccountRepositoryTest{
+	@Autowired	
+	DataSource dataSource;
+
+	@Autowired
+	JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	AccountRepository accountRepository;
+	<!--
+	@Test
+	public void di(){
+	        try(Co nnection connection = dataSource.getConnection()){
+ 
+	        	DatabaseMetaData metaData = connection.getMetaData();
+		System.out.println(metaData.getURL());
+		System.out.println(metaData.getDriverName());
+		System.out.println(metaData.getUserName());
+	        }
+	}	-->
+
+	@Test
+	public void di() throws SQLException{
+	        Account account = new Account();
+	        account.setUsername("keesun");
+	        account.setPassword("pass");
+
+	        Account newAccount = accountRepository.save(account);
+
+	        assertThat(newAccount).isNotNull(); 
+
+	        Optional<Account> existingAccount = accountRepository.findByUsername(newAccount.getUsername());
+	        assertThat(existingAccount).isNotEmpty();
+
+	        Optional<Account> nonexistingAccount = accountRepository.findByUsername("whiteship");
+	        assertThat(existingAccount).isEmpty();
+	
+	
+	}
+}
+
+인메모리 db 추가하기!
+<dependency>
+	<groupId>com.h2database</groupId>
+	<artifactId>h2</artifactId>
+	<scope>test</scope>
+</dependency>
+
+
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/springboot
+spring.datasource.username=keesun
+spring.datasource.password=pass
+
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true 
+
+
+
+
+

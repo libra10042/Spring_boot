@@ -1,0 +1,50 @@
+의존성 추가. 
+
+<dependency>
+	<groupdId>org.postgresql</groupId>
+	<artifactId>postgresql</artifactId>
+</dependency>
+
+
+
+spring.datasource.hikari.maximum-pool-size=4
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/sprinboot
+spring.datasource.username=keesun
+spring.datasource.password=pass
+────────────────────────────────
+
+@Component
+public class PgSQLRunner implements ApplicationRunner{
+
+	@Autowired
+	DataSource dataSource;
+
+	@Autowired
+	JdbcTemplate jdbcTemplate;
+
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+	        try(Connection connection = dataSource.getConnection()){
+		System.out.println(dataSource.getClass());	
+		System.out.println(connection.getMetaData().getDriverName());
+		System.out.println(connection.getMetaData().getURL());
+		System.out.println(connection.getMetaData().getUserName());
+
+		Statement statement = connection.createStatement();
+		String sq = "CREATE TABLE account(ID INTEGER NOT NULL, name VARCHAR(255) id))";
+		statement.executeUpdate(sql);
+                           }
+
+	        jdbcTemplate.execute("INSERT INTO account VALUES(2, 'whiteship')");
+	}
+}
+
+
+
+
+
+
+
+
+
