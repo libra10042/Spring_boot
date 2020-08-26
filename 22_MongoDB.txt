@@ -1,0 +1,57 @@
+MongoDB는 JSON기반의 도큐먼트 데이터베이스이다.
+(스키마가 없다.)
+
+Docker를 사용해서 설치 진행. !!
+
+의존성 추가. 
+- spring-boot-starter-data-mongodb
+
+
+MongoDB 설치 및 실행(도커)
+- docker run -p 20017:27017 --name mongo_boot -d mongo
+- docker exec -i -t mongo_boot bash
+- mongo
+
+
+스프링 데이터 몽고 DB
+- MongoTemplate
+- MongoRepository
+- 내장형 MongoDB(테스트용)
+	-- de.flapdoodle.embed:de.flapdoodle.embed.mongo
+- @DataMongoTest 
+
+────────────────────────────────
+ <dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-mongodb</artifactId>
+</dependency>
+
+
+
+────────────────────────────────
+@SpringBootApplication
+public class SpringbootmongoApplication{
+
+	@Autowired
+	MongoTemplate mongoTemplate;
+
+ 	public static void main(String[] args){
+		SpringApplication.run(SpringbootmongoApplication.class, args);
+	}
+
+
+	@Bean
+	public ApplicationRunner applicationRunner(){
+	        return args -> {
+		Account account = new Account();
+		account.setEmail("aaa@bbb");
+		account.setUsername("aaa");
+
+		mongoTemplate.insert(account);
+ 	        };
+ 	}	
+
+
+
+
+}
