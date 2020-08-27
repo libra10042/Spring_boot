@@ -35,6 +35,9 @@ public class SpringbootmongoApplication{
 	@Autowired
 	MongoTemplate mongoTemplate;
 
+	@Autowired
+	AccountRepository accountRepository
+
  	public static void main(String[] args){
 		SpringApplication.run(SpringbootmongoApplication.class, args);
 	}
@@ -44,14 +47,54 @@ public class SpringbootmongoApplication{
 	public ApplicationRunner applicationRunner(){
 	        return args -> {
 		Account account = new Account();
-		account.setEmail("aaa@bbb");
-		account.setUsername("aaa");
-
+		account.setEmail("whteship@gmail.com");
+		account.setUsername("whiteship");
 		mongoTemplate.insert(account);
+
+		System.out.println("finished");
  	        };
  	}	
-
-
-
-
 }
+
+
+
+
+public interface AccountRepository extends MongoRepository<Account, String>{
+	Optional<Account> findByEmail(String email);
+}
+
+
+
+<dependency>
+	<groupId>de.flapdoodle.embed</groupId>
+	<artifactId>de.flapdoodle.embed.mongo</artifactId>
+	<scope>test</scope>
+</dependency>
+
+
+@RunWith(SpringRunner.class)
+@DataMongoTest
+public class AccountRepositoryTest{
+
+	@Autowired
+	AccountRepository accountRepository
+
+	@Test
+	public void findByEmail(){
+		Account account = new Account();
+		account.setUsername("keesun");
+		account.setEmail("keesun@gmail.com");
+
+		accountRepository.save(account);
+
+		Optional<Account> byId = accountRepository.findById(account.getId());
+		assertThat(byId).isNotEmpty();
+
+		Optional<Account> byEmail = accountRepository.findByEmail(account.getEmail());
+		assertThat(byEmail).isNotEmpty();
+		assertThat(byEmail.get().getUsername()).isEqualTo("keesun");
+	}
+}
+
+
+

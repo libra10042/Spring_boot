@@ -1,0 +1,101 @@
+Neo4j
+
+Neo4j는 노드간의 연관 관계를 영속화하는데 유리한 그래프 데이터베이스 이다.
+
+의존성 추가. 
+-spring-boot-starter-data-neo4j
+
+
+Neo4j 설치 및 실행(도커)
+- docker run -p 7474:7474 -p 7687:7687 -d --name noe4j_boot neo4j
+- http://localhost:7474/browser
+
+
+스프링 데이터 Neo4J
+- Neo4jTemplate(Deprecated)
+- SessionFactory
+- Neo4jRepository
+
+───────────────────────────────
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-neo4j</artifactId>
+</dependency>
+
+
+
+@Component
+public class Neo4jRunner extends ApplicationRunner{
+	@Autowired
+	SessionFactory sessionFactory;
+
+	@Override
+	public void run(ApplicationArguments args) throws Exception{
+		Account account = new Account();
+		account.setEmail("whiteship@mail.com");
+		account.setUsername("whiteship");
+
+		Role role = new Role();
+		role.setName("admin");
+
+		account.getRoles().add(role);
+		
+		Session session = sessionFactory.openSession();
+		session.save(account);
+		sessionFactory.close();
+
+		System.out.println("finished ");		
+	}
+}
+
+
+
+
+@NodeEntitry
+public class Account{
+	@Id @GeneratedValue
+	private Long id; 
+
+	private String username;
+
+	private String email; 
+
+	@Relationship<type="has")
+	private Set<Role> roles = new HashSet<>();
+
+	//getter, setter
+}
+
+─────────────
+AccountRepository 사용.
+
+
+public interface AccountRepository extends Neo4jRepository<Account, Long>{
+
+}
+
+
+@Component
+public class Neo4jRunner implements ApplicationRunner{
+
+	@Autowired
+	AccountRepository accountRepository;
+	
+	@Override
+	public void run(ApplicaitonArguments args) throws Exception{
+		Account account = new Account();
+		accout.setEmail("aaa@mail.com");
+		account.setUsername("aaa");
+
+		Role role = new Role();
+		role.setName("user");
+
+		account.getRoles().add(role);
+		
+		accountRepository.save(account);
+
+		System.out.println("finished");  
+	}
+}
+
+
